@@ -9,8 +9,7 @@ gem 'puma', '~> 3.0'  # Use Puma as the app server
 
 
 ## Database ------------
-gem 'pg',      group: :production
-gem 'sqlite3', group: [:development, :test]
+gem 'pg'
 
 
 
@@ -26,12 +25,6 @@ gem 'wkhtmltopdf-binary'  # required by pdfkit; includes osx and linux binaries
 
 ## JS libraries ------------
 gem 'angularjs-rails'
-
-
-
-## Other ------------
-# Windows does not include zoneinfo files, so bundle the tzinfo-data gem
-gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 
 
