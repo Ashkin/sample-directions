@@ -1,0 +1,176 @@
+
+// Sass vars ------------
+
+// Colors
+$window_border_color: transparentize(skyblue, 0.5);
+$window_shadow_color: rgba(0,0,20, 0.3);
+$window_background_color: white;
+
+// Sidebar styles
+$sidebar_width: 20em;
+
+// Window styles
+$window_border: 1px solid $window_border_color;
+$window_shadow: 2px 2px 0.5em $window_shadow_color;
+
+
+
+// Shared UI ------------
+
+.full-page {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.floating {
+  position: absolute;
+}
+
+.window {
+  background: $window_background_color;
+  border: $window_border;
+  box-shadow: $window_shadow;
+}
+
+.error {
+  color: red;
+}
+
+// Elements ------------
+
+#map {
+  // Google map
+  @extend .full-page;
+
+  background: grey;
+}
+
+#map-sidebar {
+  @extend .full-page;
+
+  width: $sidebar_width;
+  z-index: 1;  // position just above the map to show the shadow
+  pointer-events: none;  // Allow interacting with the map
+
+  #map-controls {
+    height: 6em;
+    margin: 0.2em;
+    padding: 0.7em 0.5em;
+    border: $window_border;
+    background-color: $window_background_color;
+    box-shadow: $window_shadow;
+    pointer-events: all;
+
+
+    input {
+      width: 90%;
+      font-size: 0.95rem;
+    }
+  }
+
+
+  &.visible {
+    // when visible, add window styling to the sidebar
+    @extend .window;
+
+    border: none;
+    border-right: $window_border;  // but only a right-border!
+    pointer-events: all;
+
+    //TODO: fade in
+
+    #map-controls {
+      // merge with the sidebar when it's visible
+      border-color: transparent;
+      box-shadow: none;
+    }
+
+    #pdf-controls {
+      display: block;
+    }
+  }
+
+
+  #pdf-controls {
+    display: none;
+    height: 5.5em;
+    padding: 0.25em 0;
+    border-top: 1px solid gray;
+    border-bottom: 1px solid gray;
+    background: aliceblue;
+
+    button {
+      width: calc(100% - 0.5em);
+      padding: 0.25em;
+      margin: 0.125em 0.25em;
+    }
+  }
+
+
+  #map-directions {
+    height: calc(100% - 6em - 6em);
+
+    .directions {
+      height: 100%;
+      overflow: auto;
+    }
+  }
+}
+
+
+
+#email-window {
+  @extend .floating;
+  @extend .window;
+
+  top: 5em;
+  right: 1em;
+  width: 25em;
+  padding: 0.5em;
+
+  form#email-form {
+    margin-top: 0.5em;
+    padding: 0.5em;
+
+    div.email {
+      padding: 0.5em;
+      margin: 0.5em 0;
+      border: 1px solid #cce;
+      border-radius: 0.25em;
+    }
+
+    input, textarea {
+      width: 95%;
+      margin: 0.25em;
+    }
+
+    textarea {
+      height: 7em;
+      resize: vertical;
+    }
+
+    hr {
+      margin: 1em 0;
+    }
+
+    #email-validation {
+      width: calc(100% - 7em - 2em); // button - 2em spacing
+      float: left;
+      color: firebrick;
+    }
+
+    button#email-send {
+      float: right;
+      width: 7em;
+      padding: 0.25em 2em;
+    }
+
+    a {
+      float: right;
+      font-size: 0.75em;
+    }
+  }
+}

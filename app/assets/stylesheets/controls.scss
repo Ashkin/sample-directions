@@ -1,0 +1,36 @@
+// Colors
+$input_active_color: #05a;
+$input_placeholder_color: darkgray;
+$input_active_placeholder_color: transparentize($input_active_color, 0.25);
+
+
+
+// Worksheet-like input fields
+input, textarea {
+  margin: 0.5em;
+  border: none;
+  border-bottom: 1px solid gray;
+  background: transparent;
+
+  // Better placeholder color
+  &::-webkit-input-placeholder { color: $input_placeholder_color; }
+  &::-moz-placeholder          { color: $input_placeholder_color; }
+  &:-ms-input-placeholder      { color: $input_placeholder_color; }
+
+
+  // Kill that annoying glow on :active/:focus
+  outline-color: transparent;
+
+  &:active, &:focus {
+    // and replace it with text/placeholder/border colors
+    color: $input_active_color;
+    border-bottom-color: $input_active_color;
+
+    &::-webkit-input-placeholder { color: $input_active_placeholder_color; }
+    &::-moz-placeholder          { color: $input_active_placeholder_color; }
+    &:-ms-input-placeholder      { color: $input_active_placeholder_color; }
+  }
+}
+
+
+//TODO: Custom button css

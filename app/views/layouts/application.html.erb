@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ItsOnMe -- PDF example</title>
+    <%= csrf_meta_tags %>
+
+    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+
+  </head>
+
+  <body>
+    <%= yield %>
+    <%= javascript_include_tag 'https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.js' %>
+
+    <script type="text/javascript" src="<%= api_v1_directions_map_url %>"></script>
+    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+  </body>
+</html>

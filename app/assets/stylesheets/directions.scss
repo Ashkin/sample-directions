@@ -1,0 +1,46 @@
+/*
+div.directions {
+  border-top:  2px solid black;
+
+  .totals {
+    padding: 0.5em;
+    margin-bottom: 0.5em;
+    border-bottom: 1px solid gray;
+
+    .distance, .duration {
+      color: gray;
+
+      span {
+        color: black;
+      }
+    }
+  }
+
+
+  .steps {
+
+    li.step {
+      padding: 0.5em;
+      padding-bottom: 1.5em;
+      list-style-type: none;
+
+      &:nth-child(odd)  { background-color: rgba(0,0,0, 0.10); }
+      &:nth-child(even) { background-color: rgba(0,0,0, 0.05); }
+
+      &:hover { background-color: transparentize(skyblue, 0.5); }
+
+
+      .instruction {
+        display: block;
+        width: 100%;
+      }
+
+      .distance { float: left; }
+      .duration { float: right; }
+      .distance, .duration {
+        color: gray;
+      }
+    }
+  }
+}
+*/

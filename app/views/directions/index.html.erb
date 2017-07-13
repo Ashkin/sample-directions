@@ -1,0 +1,43 @@
+<!-- index -->
+
+<div ng-controller="directionsCtrl">
+  <div id="map"></div>
+  <div id="map-sidebar" ng-class="sidebar_class()">
+    <div id="map-controls">
+      <input id="address-from" placeholder="Enter starting point..."
+             ng-model="markers.from.model" ng-blur="marker_delegate('from', 'blur')" ng-keypress="marker_delegate('from', $event.key)" ng-class="markers.from.class()" />
+      <input id="address-to"   placeholder="Enter destination..."
+             ng-model="markers.to.model"   ng-blur="marker_delegate('to', 'blur')"   ng-keypress="marker_delegate('to', $event.key)" ng-class="markers.to.class()" />
+      <span class="error" ng-show="markers.from.not_found || markers.to.not_found">
+        Sorry! We couldn't find that address.
+      </span>
+    </div>
+    <div id="pdf-controls">
+      <form id="pdf-form" target="_blank" method="post" action="/api/v1/directions/pdf">
+        <input type="hidden" id="pdf-form-address-from" name="address_from" ng-model="markers.from.address" />
+        <input type="hidden" id="pdf-form-address-to" name="address_to" ng-model="markers.to.address" />
+        <button id="pdf-convert" ng-click="request_pdf()">Convert Directions to PDF</button>
+      </form>
+      <button id="pdf-convert" ng-click="show_email()">Convert and Email PDF</button>
+    </div>
+    <div id="map-directions" ng-show="!!directions" ng-bind-html="directions"></div>
+  </div>
+
+  <div id="email-window" ng-show="display_email_window">
+    <form id="email-form" class="hidden">
+      <input name="password" class="password" placeholder="password?" />
+      <div class="email">
+        <input ng-model="email.address" name="email-address" placeholder="Email address" type="email" />
+        <input ng-model="email.subject" name="email-subject" placeholder="Email subject" />
+        <textarea ng-model="email.message" name="email-message" placeholder="Email message"></textarea>
+      </div>
+      <div id="email-validation">
+        {{email.error}}
+      </div>
+      <button id="email-send" ng-click="send_email()" ng-disabled="email.sent">Send!</button>
+      <br class="clearfix" />
+      <a href="" ng-show="email.status == 'sent'" ng-click="reset_email_form()">Send another email</a>
+    </form>
+  </div>
+
+</div>

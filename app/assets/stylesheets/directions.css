@@ -1,0 +1,88 @@
+
+/* Reset */
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+
+
+/* Summary */
+
+div.directions div.summary {
+  padding: 1em;
+  padding-top: 0.5em;
+  margin-bottom: 2em;
+  border: 2px solid gray;
+}
+div.directions div.summary .title {
+  display: inline-block;
+  width: 100%;
+  font-size: 2em;
+  text-align: center;
+  font-weight: bold;
+  padding-bottom: 0.25em;
+}
+/* Label */
+div.directions div.summary dt {
+  display: inline-block;
+  width: 4em;
+  text-align: right;
+  color: gray;
+}
+/* Info */
+div.directions div.summary dd {
+  display: inline;
+  color: black;
+  font-weight: bold;
+}
+
+
+
+/* Totals */
+
+div.directions div.summary .totals {
+  color: gray;
+  padding-top: 0.5em;
+}
+div.directions div.summary .totals span { color: black; }
+
+
+
+
+/* Steps */
+
+div.directions .steps li.step {
+  padding: 0.5em;
+  padding-bottom: 1.5em;  /* leave room for trailing info (distance/duration) */
+  list-style-type: none;
+}
+
+div.directions .steps li.step.start,
+div.directions .steps li.step.end {
+  padding-bottom: 0.5em;
+}
+
+
+/* no border on second li */
+div.directions .steps li.step:nth-child(n+3) { border-top: 1px solid gray; }
+/* Thick black border signaling the beginning/end of the directions */
+div.directions .steps li.step.start { border: none; border-bottom: 2px solid black; }
+div.directions .steps li.step.end { border: none; border-top: 2px solid black; }
+/* Even/Odd hilight */
+div.directions .steps li.step:nth-child(odd)  { background-color: transparent; }
+div.directions .steps li.step:nth-child(even) { background-color: rgba(0,0,0, 0.1); }
+/* Hover */
+div.directions .steps li.step:hover { background-color: rgba(135, 206, 235, 0.5); }  /* skyblue, 0.5 alpha */
+
+/* Actual driving instruction should be large and stand out */
+div.directions .steps li.step .instruction {
+  display: block;
+  width: 100%;
+}
+
+/* Fade out extra info */
+div.directions .steps li.step .distance { float: left;  color: gray; }
+div.directions .steps li.step .duration { float: right; color: gray; }
+

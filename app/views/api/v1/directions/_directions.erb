@@ -1,0 +1,42 @@
+
+
+<div class="directions">
+
+  <div class="summary">
+    <span class="title">Directions</span>
+    <div class="addresses">
+      <dt>From: </dt>
+      <dd><%= @from_address %></dd>
+      <br/>
+      <dt>To: </dt>
+      <dd><%= @to_address %></dd>
+    </div>
+    <div class="totals">
+      <dt>Distance: </dt>
+      <dd><%= @total_distance %></dd>
+      <br/>
+      <dt>Time: </dt>
+      <dd><%= @total_duration %></dd>
+    </div>
+  </div>
+
+  <div class="steps">
+    <ul>
+      <li class="step start">
+        Starting at <b><%= @from_address %></b>
+      </li>
+      <% @steps.each do |step| %>
+        <li class="step">
+          <span class="instruction"><%= raw step['html_instructions'] %></span>
+          <span class="maneuver"><%= step['maneuver']['text'] rescue '' %></span>
+          <span class="distance"><%= step['distance']['text'] rescue '' %></span>
+          <span class="duration"><%= step['duration']['text'] rescue '' %></span>
+        </li>
+      <% end %>
+      <li class="step end">
+        You have arrived at <b><%= @to_address %></b>
+      </li>
+    </ul>
+  </div>
+
+</div>
