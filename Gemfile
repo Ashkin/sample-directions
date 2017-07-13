@@ -16,7 +16,7 @@ gem 'pg'
 ## Assets (styles, js, etc) ------------
 gem 'turbolinks', '~> 5'
 gem 'sass-rails', '~> 5.0'  # Sassy!
-gem 'uglifier', '>= 1.3.0'  # JS Compressor
+# gem 'uglifier', '>= 1.3.0'  # JS Compressor
 
 gem 'pdfkit'              # Markup->PDF
 gem 'wkhtmltopdf-binary'  # required by pdfkit; includes osx and linux binaries
