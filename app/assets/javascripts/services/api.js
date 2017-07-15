@@ -78,6 +78,7 @@ ui.service('api', function($http, apiConfig) {
       .then(function(response) {
         resolve()
       }).catch(function(err) {
+        if (err.status == -1)  return reject('You appear to be offline')
         if (err.status == 400) return reject('Invalid email address')
         if (err.status == 403) return reject('Incorrect password')
         if (err.status == 500) return reject('Server error.')
