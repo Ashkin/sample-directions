@@ -71,16 +71,8 @@ class Api::V1::DirectionsController < Api::V1::BaseController
     # Handle missing address(es)
     return  unless assert_addresses_exist(address_from, address_to)
 
-
-    # Fetch directions
-    markup = get_directions_markup( address_from, address_to )
-
-    Rails.root
-
-    kit = PDFKit.new(markup, :page_size => 'Letter')
-    kit.stylesheets << Rails.root.join('app','assets','stylesheets','directions.css').to_s
-
-    send_data kit.to_pdf, type: 'application/pdf', disposition: 'inline'
+    # Fetch PDF data and stream it to the client
+    send_data( get_pdf_data(address_from, address_to), type: 'application/pdf', disposition: 'inline' )
 
   rescue StandardError => err
     ##TODO: handle possible PDFKit errors
@@ -91,16 +83,48 @@ class Api::V1::DirectionsController < Api::V1::BaseController
 
   # POST /email
   def email
+    email = params['email']
+    addresses = {
+      'from': params['address_from'],
+      'to':   params['address_to']
+    }
+
+
     # Verify email password
-    unless params['email_password'] == ENV['EMAIL_PASSWORD']
+    unless email['password'] == ENV['EMAIL_PASSWORD']
       # and return a 403 if it fails
       render json: {status: 'error', error: 'Invalid password'}, status: 403
+      return
     end
 
-    ##TODO: too many requests
+    # Validate email address
+    # Credit goes to: http://www.regular-expressions.info/email.html
+    ##! This obviously does not catch invalid domains, etc.  If this is an issue there are several services that offer this ability, e.g. RealEmail
+    email_regex = /\A[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\z/
+
+    unless email_regex.match(email['address'])
+      render json: {status: "error", message: "Invalid email address"}, status: 400
+      return
+    end
 
 
-    render json: {status: 'nyi', message: 'Email not yet implemented'}, status: 501
+
+    ##TODO: catch and return too many requests (429) per ip
+
+
+    # Generate raw PDF
+    pdf = get_pdf_data( addresses['from'], addresses['to'] )
+
+    # Send email
+    PdfMailer::email_pdf(email, addresses, pdf).deliver_now
+
+    # Return 200:ok response
+    render json: {status: "ok", message: "email sent"}, status: :ok
+
+
+  rescue StandardError => err
+    # Handle ActionMailer errors here
+    render json: {status: "error", message: "Unknown error"}, status: 500
   end
 
 
@@ -176,6 +200,20 @@ class Api::V1::DirectionsController < Api::V1::BaseController
     @steps = legs['steps']
     
     return render_to_string partial: 'directions.erb'
+  end
+
+
+  # Generate pdf
+  def get_pdf_data(from, to)
+    # Fetch Directions
+    markup = get_directions_markup(from, to)
+
+    # Generate PDF
+    kit = PDFKit.new(markup, :page_size => 'Letter')
+    kit.stylesheets << Rails.root.join('app','assets','stylesheets','directions.css').to_s
+
+    # Return raw data
+    return kit.to_pdf
   end
 
 end
