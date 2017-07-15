@@ -70,21 +70,21 @@ ui.service('api', function($http, apiConfig) {
   }
 
 
-  this.sendEmail = function(address_from, address_to, email) {
+  this.sendEmail = function(email, address_from, address_to) {
     var url = apiConfig.base_url + '/email'
 
     return new Promise(function(resolve, reject) {
-      $http.post(url, {address_from: address_from, address_to: address_to})
+      $http.post(url, {email: email, address_from: address_from, address_to: address_to})
       .then(function(response) {
         resolve()
       }).catch(function(err) {
-        if (err.status == 400) return reject('Error: Bad request.  Check the email address')
-        if (err.status == 403) return reject('Error: Forbidden.  Likely cause: incorrect password')
-        if (err.status == 500) return reject('Error: Server error')
-        if (err.status == 502) return reject('Error: Bad gateway.  Please check your connection')
+        if (err.status == 400) return reject('Invalid email address')
+        if (err.status == 403) return reject('Incorrect password')
+        if (err.status == 500) return reject('Server error.')
+        if (err.status == 502) return reject('Bad gateway; please check your connection')
 
         console.error('(Error)  api::sendEmail(): Unexpected error:', err)
-        reject(err.message || err.statusText || 'Unknown error')
+        reject(err.message || 'Error: ' + err.statusText || 'Unknown error')
       })
     })
   }
