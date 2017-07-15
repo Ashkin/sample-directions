@@ -60,12 +60,20 @@ angular.module('ui')
 
 
 
-  // CSS Class getters ------------------------
+  // Getters ------------------------
 
+  // CSS Classes
   $scope.sidebar_class = function() {
     return (!!$scope.directions ? 'visible' : '')
   }
 
+
+  // Angular
+  $scope.send_button_text = function () {
+    if ($scope.email.status == 'sent')    return 'Email Sent'
+    if ($scope.email.status == 'sending') return 'Sending...'
+    return 'Send!'
+  }
 
 
   // Init ------------------------
@@ -78,14 +86,6 @@ angular.module('ui')
     csrf.name = 'authenticity_token'
     csrf.value = document.querySelector('meta[name="csrf-token"]').content
     form.appendChild(csrf)
-
-    // Add google maps
-    // api.getMap().then(function(script) {
-    //   applyMap(script).then(function() {
-    //     initMap()
-    //   })
-    // })
-
   })()
 
 
@@ -135,9 +135,19 @@ angular.module('ui')
     $scope.email.status = 'sending'
     $scope.email.error = null
 
-    api.sendEmail($scope.email, $scope.markers.from.address, $scope.markers.to.address)
+
+    // Cleanup
+    var email_copy = JSON.parse(JSON.stringify( $scope.email ))
+    delete email_copy.status
+    delete email_copy.error
+
+
+    // Send the email!
+    api.sendEmail(email_copy, $scope.markers.from.address, $scope.markers.to.address)
     .then(function() {
       $scope.email.status = 'sent'
+
+      _scope_update()
     }).catch(function(err) {
       console.error("(Error)  send_mail: caught error:", err)
       $scope.email.status = null
@@ -271,9 +281,9 @@ angular.module('ui')
   var update_directions = function() {
     // Clear directions unless both markers exist
     if (!$scope.markers.from.object  ||  !$scope.markers.to.object) {
-      return $scope.directions = null
-
+      $scope.directions = null
       _scope_update()
+      return
     }
 
     // Fetch directions
