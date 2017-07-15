@@ -1,18 +1,4 @@
 
-/*
- * var marker = new google.maps.Marker({
- *   position: default_location,
- *   map: window.map
- * })
- *
- */
-
-
-// show/hide/delete markers via click:
-// https://developers.google.com/maps/documentation/javascript/examples/marker-remove
-
-
-
 angular.module('ui')
 .controller('directionsCtrl', function($scope, $sce, $timeout, api) {
 
@@ -105,7 +91,6 @@ angular.module('ui')
 
       update_directions()
     })
-
   }
 
 
@@ -132,7 +117,7 @@ angular.module('ui')
     if ($scope.email.address == '') return $scope.email.error = 'Missing: email address'
     if ($scope.email.subject == '') return $scope.email.error = 'Missing: email subject'
 
-    $scope.email.status = 'sending'
+    $scope.email.status = 'sending'  // will disable [send]
     $scope.email.error = null
 
 
@@ -145,7 +130,7 @@ angular.module('ui')
     // Send the email!
     api.sendEmail(email_copy, $scope.markers.from.address, $scope.markers.to.address)
     .then(function() {
-      $scope.email.status = 'sent'
+      $scope.email.status = 'sent'  // will disable [send] and show the [send another email] link.
 
       _scope_update()
     }).catch(function(err) {
@@ -165,12 +150,6 @@ angular.module('ui')
 
 
   // Private ------------------------
-
-
-  // var applyMap = function(script) {
-  //   var tag = document.createElement('script')
-  //   tag.src = api.getMapURI()
-  // }
 
 
   var directions_exist = function() {
@@ -262,9 +241,6 @@ angular.module('ui')
   var update_map = function() {
     var from = $scope.markers.from
     var to   = $scope.markers.to
-
-    window.from = from
-    window.to   = to
 
     // Don't bother if there aren't any markers.
     if (from.object == null  &&  to.object == null)
