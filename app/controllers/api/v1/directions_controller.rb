@@ -2,7 +2,7 @@ require 'net/http'
 
 class Api::V1::DirectionsController < Api::V1::BaseController
 
-  skip_before_filter :verify_authenticity_token, :only => [:map]
+  skip_before_action :verify_authenticity_token, :only => [:map]
 
   # GET /map
   # Returns Google Maps script
