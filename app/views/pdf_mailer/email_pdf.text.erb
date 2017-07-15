@@ -1,0 +1,17 @@
+Someone has sent you directions!
+================================
+
+See the attached PDF.
+
+Starting address: <%= @addresses[:from] %>
+Destination: <%= @addresses[:to] %>
+
+
+<% if @message.present? %>
+A personal note follows:
+------------------------
+<%= @message %>
+
+<% end %>
+
+This email was generated and sent from: http://sample-directions.herokuapp.com

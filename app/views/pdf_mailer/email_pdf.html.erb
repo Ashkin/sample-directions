@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+    <style type="text/css">
+      * {
+        box-sizing: border-box;
+        color: black;
+      }
+      .fade {
+        color: gray;
+      }
+      .message {
+        background-color: lightgray;
+        margin: 0 10%;
+        padding: 1em;
+        text-align: justify;
+      }
+      .footer {
+        width: 100%;
+        padding: 0.5em;
+        margin-top: 4em;
+        font-size: 80%;
+        background-color: #eee;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>Someone has sent you directions!</h3>
+    <p>See the attached PDF.</p>
+    <span class="fade">Starting address:</span> <b><%= @addresses[:from] %></b><br/>
+    <span class="fade">Destination:</span> <b><%= @addresses[:to] %></b><br/>
+
+    <br/>
+
+    <% if @message.present? %>
+      <p>A personal note follows:</p>
+      <div class="message"><%= @message %></div>
+    <% end %>
+
+    <div class="footer">
+      This email was generated and sent from <a href="http://sample-directions.herokuapp.com">http://sample-directions.herokuapp.com</a>.
+    </div>
+  </body>
+</html>
