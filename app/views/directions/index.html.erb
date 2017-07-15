@@ -24,17 +24,18 @@
   </div>
 
   <div id="email-window" ng-show="display_email_window">
+    <aside>Share the directions using the form below:</aside>
     <form id="email-form" class="hidden">
-      <input name="password" class="password" placeholder="password?" />
       <div class="email">
         <input ng-model="email.address" name="email-address" placeholder="Email address" type="email" />
         <input ng-model="email.subject" name="email-subject" placeholder="Email subject" />
         <textarea ng-model="email.message" name="email-message" placeholder="Email message"></textarea>
       </div>
+      <input ng-model="email.password" name="password" class="password" placeholder="password?" />
       <div id="email-validation">
         {{email.error}}
       </div>
-      <button id="email-send" ng-click="send_email()" ng-disabled="email.sent">Send!</button>
+      <button id="email-send" ng-click="send_email()" ng-disabled="email.status == 'sent' || email.status == 'sending'">{{send_button_text()}}</button>
       <br class="clearfix" />
       <a href="" ng-show="email.status == 'sent'" ng-click="reset_email_form()">Send another email</a>
     </form>
