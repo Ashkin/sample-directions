@@ -11,7 +11,8 @@ class Api::V1::DirectionsController < Api::V1::BaseController
     render plain: https_get(url, verify: false).body, content_type: 'text/javascript'
 
   rescue StandardError => err
-    render json: {status: 'error', error: err.message || 'Unknown error'}, status: 500
+    ##TODO: catch 403, 404(?), 500, 503, etc. and exponentially backoff
+    render json: {status: 'error', message: err.message || 'Unknown error'}, status: 500
   end
 
 
@@ -76,7 +77,7 @@ class Api::V1::DirectionsController < Api::V1::BaseController
 
   rescue StandardError => err
     ##TODO: handle possible PDFKit errors
-    render json: {status: 'error', error: 'An unknown error occured', details: err.message}
+    render json: {status: 'error', message: 'An unknown error occured', details: err.message}
   end
 
 
@@ -93,7 +94,7 @@ class Api::V1::DirectionsController < Api::V1::BaseController
     # Verify email password
     unless email['password'] == ENV['EMAIL_PASSWORD']
       # and return a 403 if it fails
-      render json: {status: 'error', error: 'Invalid password'}, status: 403
+      render json: {status: 'error', message: 'Invalid password'}, status: 403
       return
     end
 
@@ -138,7 +139,7 @@ class Api::V1::DirectionsController < Api::V1::BaseController
     errors = []
     errors << 'address_from missing'  unless address_from
     errors << 'address_to missing'    unless address_to
-    render json: {status: 'error', error: errors.join('; '), details: 'assert_addresses_exist', address_from: address_from, address_to: address_to }, status: :bad_request
+    render json: {status: 'error', message: errors.join('; '), details: 'assert_addresses_exist', address_from: address_from, address_to: address_to }, status: :bad_request
     return false
   end
 
