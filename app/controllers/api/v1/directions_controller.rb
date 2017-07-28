@@ -147,9 +147,9 @@ class Api::V1::DirectionsController < Api::V1::BaseController
     return true  if address_from.present? and address_to.present?
 
     errors = []
-    errors << 'address_from missing'  unless address_from
-    errors << 'address_to missing'    unless address_to
-    render json: {status: 'error', message: errors.join('; '), details: 'Assertion failed: addresses exist',
+    errors << 'address_from missing'  unless address_from.present?
+    errors << 'address_to missing'    unless address_to.present?
+    render json: {status: 'error', message: 'Assertion failed: both addresses exist', details: errors.join('; '), 
                   address_from: address_from, address_to: address_to }, status: :bad_request
     return false
   end
