@@ -41,16 +41,24 @@ angular.module('ui')
     error: null
   }
 
-  $scope.directions = null
   $scope.display_email_window = false
+  $scope.directions = {
+    markup: null,
+    no_route_available: false
+  }
 
+
+  window.directions = $scope.directions
 
 
   // Getters ------------------------
 
   // CSS Classes
   $scope.sidebar_class = function() {
-    return (!!$scope.directions ? 'visible' : '')
+    // Catch `$scope.directions` not being defined yet  (called from markup reference)
+    if (!$scope.directions)  return ''
+
+    return (!!$scope.directions.markup ? 'visible' : '')
   }
 
 
@@ -153,7 +161,7 @@ angular.module('ui')
 
 
   var directions_exist = function() {
-    return !!$scope.directions
+    return !!$scope.directions.markup
   }
 
 
@@ -179,8 +187,10 @@ angular.module('ui')
       // Otherwise, fetch its position
       resolve_marker_address(marker)
       .then(function(geometry) {
-        // Clear any error
+        // Clear any existing error, directions, and polylines
         marker.not_found = null
+        $scope.directions.markup = null
+        clear_polylines()
 
         // update its placement, and update the map
         move_marker(marker, geometry)
@@ -261,7 +271,7 @@ angular.module('ui')
   var update_directions = function() {
     // Clear directions unless both markers exist
     if (!$scope.markers.from.object  ||  !$scope.markers.to.object) {
-      $scope.directions = null
+      $scope.directions.markup = null
       clear_polylines()
 
       _scope_update()
@@ -271,10 +281,15 @@ angular.module('ui')
     // Fetch directions and polylines
     api.getDirections($scope.markers.from.address, $scope.markers.to.address)
     .then(function(directions) {
-      $scope.directions = $sce.trustAsHtml(directions.markup)
+      $scope.directions.no_route_available = null
+      $scope.directions.markup = $sce.trustAsHtml(directions.markup)
       update_polylines(directions.polylines)
 
       _scope_update()
+    }).catch(function(err) {
+      if (err == 404) {
+        $scope.directions.no_route_available = true
+      }
     })
   }
 

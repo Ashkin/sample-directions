@@ -67,6 +67,8 @@ ui.service('api', function($http, apiConfig) {
         resolve(response.data)
 
       }).catch(function(err) {
+        if (err.status == 404)  return reject(404)
+
         console.error('(Error)  Unexpected error:', err)
         reject(err.message || err.statusText || 'Unknown error')
       })

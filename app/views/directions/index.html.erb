@@ -11,6 +11,9 @@
       <span class="error" ng-show="markers.from.not_found || markers.to.not_found">
         Sorry! We couldn't find that address.
       </span>
+      <span class="error" ng-show="directions.no_route_available">
+        Unable to find a route.
+      </span>
     </div>
     <div id="pdf-controls">
       <form id="pdf-form" target="_blank" method="post" action="/api/v1/directions/pdf">
@@ -20,7 +23,7 @@
       </form>
       <button id="pdf-convert" ng-click="show_email()">Convert and Email PDF</button>
     </div>
-    <div id="map-directions" ng-show="!!directions" ng-bind-html="directions"></div>
+    <div id="map-directions" ng-show="!!directions.markup" ng-bind-html="directions.markup"></div>
   </div>
 
   <div id="email-window" ng-show="display_email_window">
