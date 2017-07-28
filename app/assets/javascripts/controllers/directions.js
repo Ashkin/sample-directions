@@ -179,6 +179,9 @@ angular.module('ui')
       // Otherwise, fetch its position
       resolve_marker_address(marker)
       .then(function(geometry) {
+        // Clear any error
+        marker.not_found = null
+
         // update its placement, and update the map
         move_marker(marker, geometry)
         update_map()
