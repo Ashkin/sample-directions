@@ -7,7 +7,7 @@ class Api::V1::DirectionsController < Api::V1::BaseController
   # GET /map
   # Returns Google Maps script
   def map
-    url = "https://maps.googleapis.com/maps/api/js?key=#{ENV['GOOGLE_MAPS_API_KEY']}"
+    url = "https://maps.googleapis.com/maps/api/js?key=#{ENV['GOOGLE_MAPS_API_KEY']}&libraries=geometry"
     render plain: https_get(url, verify: false).body, content_type: 'text/javascript'
 
   rescue StandardError => err
@@ -34,7 +34,7 @@ class Api::V1::DirectionsController < Api::V1::BaseController
 
 
 
-  # POST /directions/:address1/:address2
+  # POST /directions
   def directions
     address_from = params['address_from']
     address_to   = params['address_to']
@@ -46,17 +46,27 @@ class Api::V1::DirectionsController < Api::V1::BaseController
     respond_to do |format|
       # Pass the json response straight through (for testing)
       format.json do
-        result = get_directions_data(address_from, address_to)
-        render json: result.body, status: result.code
+        directions_data = get_directions_data( params['address_from'], params['address_to'] )
+
+        # Handle: no route
+        return  unless assert_addresses_exist(address_from, address_to)
+
+        # Construct json response
+        markup    = get_directions_markup(directions_data)
+        polylines = get_directions_polylines(directions_data)
+
+        # and return it
+        render json: {status: 'ok', markup: markup, polylines: polylines}, status: :ok
       end
 
       # Construct markup and return it.
       format.html do
-        markup = get_directions_markup( params['address_from'], params['address_to'] )
+        directions_data = get_directions_data( params['address_from'], params['address_to'] )
+        markup = get_directions_markup(directions_data)
+
         render plain: markup
       end
     end
-
 
   end
 
@@ -94,7 +104,7 @@ class Api::V1::DirectionsController < Api::V1::BaseController
     # Verify email password
     unless email['password'] == ENV['EMAIL_PASSWORD']
       # and return a 403 if it fails
-      render json: {status: 'error', message: 'Invalid password'}, status: 403
+      render json: {status: 'error', message: 'Invalid password'}, status: :forbidden
       return
     end
 
@@ -104,7 +114,7 @@ class Api::V1::DirectionsController < Api::V1::BaseController
     email_regex = /\A[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\z/
 
     unless email_regex.match(email['address'])
-      render json: {status: "error", message: "Invalid email address"}, status: 400
+      render json: {status: 'error', message: 'Invalid email address'}, status: :bad_request
       return
     end
 
@@ -120,28 +130,38 @@ class Api::V1::DirectionsController < Api::V1::BaseController
     PdfMailer::email_pdf(email, addresses, pdf).deliver_now
 
     # Return 200:ok response
-    render json: {status: "ok", message: "email sent"}, status: :ok
+    render json: {status: 'ok', message: 'email sent'}, status: :ok
 
 
   rescue StandardError => err
     # Handle ActionMailer errors here
-    render json: {status: "error", message: "Unknown error"}, status: 500
+    render json: {status: 'error', message: 'Unknown error'}, status: 500
   end
 
 
 
   private
 
-
+  # Return an error response unless both addresses exist
   def assert_addresses_exist(address_from, address_to)
     return true  if address_from.present? and address_to.present?
 
     errors = []
     errors << 'address_from missing'  unless address_from
     errors << 'address_to missing'    unless address_to
-    render json: {status: 'error', message: errors.join('; '), details: 'assert_addresses_exist', address_from: address_from, address_to: address_to }, status: :bad_request
+    render json: {status: 'error', message: errors.join('; '), details: 'Assertion failed: addresses exist',
+                  address_from: address_from, address_to: address_to }, status: :bad_request
     return false
   end
+
+  # Return a 404 response if no directions exist
+  def assert_directions_exist(directions_data)
+    return true  if directions_data['routes'].present?
+
+    render json: {status: 'error', message: 'No directions available'}, status: :not_found
+    return false
+  end
+
 
 
   # Simple Net::HTTP::Get wrapper
@@ -173,24 +193,21 @@ class Api::V1::DirectionsController < Api::V1::BaseController
     uri += '&key=' + ENV['GOOGLE_MAPS_API_KEY']
 
 
+    # Return the data as json
     # Skip SSL verification since we have no cert.
-    return https_get(uri, verify: false)
+    return JSON.parse( https_get(uri, verify: false).body )
   end
 
 
-  def get_directions_markup(address_from, address_to)
-    # Fetch the data and parse it
-    result = get_directions_data(address_from, address_to)
-    json = JSON.parse(result.body)
-
+  def get_directions_markup(directions_data)
     # Handle: no route
-    if json['routes'].empty?
+    if directions_data['routes'].empty?
       render partial: 'no_directions.erb'
       return
     end
 
     # Process route
-    legs = json['routes'].first['legs'].first
+    legs = directions_data['routes'].first['legs'].first
     
     @total_distance = legs['distance']['text']
     @total_duration = legs['duration']['text']
@@ -201,6 +218,24 @@ class Api::V1::DirectionsController < Api::V1::BaseController
     @steps = legs['steps']
     
     return render_to_string partial: 'directions.erb'
+  end
+
+
+  def get_directions_polylines(directions_data)
+    # Handle: no route
+    return []  if directions_data['routes'].empty?
+
+    paths = []
+
+    route = directions_data['routes'].first
+    legs  = route['legs']
+    steps = legs.first['steps']
+
+    steps.each { |step|
+      paths << step['polyline']['points']
+    }
+
+    return paths
   end
 
 

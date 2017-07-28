@@ -166,7 +166,7 @@ angular.module('ui')
   }
 
 
-
+ 
   // Update the marker's lat/lon and map position
   var update_marker = function(marker) {
     return new Promise(function(resolve, reject) {
@@ -177,7 +177,8 @@ angular.module('ui')
       if (marker.model.trim() == '')  return resolve(clear_marker(marker))
 
       // Otherwise, fetch its position
-      resolve_marker_address(marker).then(function(geometry) {
+      resolve_marker_address(marker)
+      .then(function(geometry) {
         // update its placement, and update the map
         move_marker(marker, geometry)
         update_map()
@@ -185,7 +186,7 @@ angular.module('ui')
         resolve()
 
       }).catch(function(err) {
-        if (err == "no results") {
+        if (err == 'no results') {
           marker.not_found = true
           resolve()
 
@@ -258,17 +259,59 @@ angular.module('ui')
     // Clear directions unless both markers exist
     if (!$scope.markers.from.object  ||  !$scope.markers.to.object) {
       $scope.directions = null
+      clear_polylines()
+
       _scope_update()
       return
     }
 
-    // Fetch directions
+    // Fetch directions and polylines
     api.getDirections($scope.markers.from.address, $scope.markers.to.address)
-    .then(function(markup) {
-      $scope.directions = $sce.trustAsHtml(markup)
+    .then(function(directions) {
+      $scope.directions = $sce.trustAsHtml(directions.markup)
+      update_polylines(directions.polylines)
 
       _scope_update()
     })
+  }
+
+
+  //TODO: Would be better to move the Polylines functions into their own module.
+
+  // Remove any existing polylines
+  var clear_polylines = function() {
+    // Guard: polylines[] undefined or empty
+    if ($scope.polylines == null)  return
+    if ($scope.polylines.length == 0) return
+
+    // Iterate over each polyline and remove it from the map
+    $scope.polylines.forEach(function(polyline) {
+      polyline.setMap(null)
+    })
+  }
+
+
+  // Display new polylines
+  var update_polylines = function(polylines) {
+    clear_polylines()
+
+    $scope.polylines = []
+
+    polylines.forEach(function(polyline) {
+      $scope.polylines.push(
+        new google.maps.Polyline({
+          strokeColor: '#55aaff',
+          strokeOpacity: 1.0,
+          strokeWeight: 3,
+          path: google.maps.geometry.encoding.decodePath(polyline),  // Decode polyline into Array<LatLng>
+          map: window.map
+        })
+      )
+
+      // window.map.addOverlay(poly)
+    })
+
+
   }
 
 })

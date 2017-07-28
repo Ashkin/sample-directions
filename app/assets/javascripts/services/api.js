@@ -3,8 +3,13 @@
 
 var ui = angular.module('ui')
 
+
+// Set up URLs
+var url_base = '/api/v1/directions'
 ui.constant('apiConfig', {
-  base_url: '/api/v1/directions'
+  url_directions: url_base + '.json',
+  url_location:   url_base + '/location',
+  url_email:      url_base + '/email'
 })
 
 
@@ -28,10 +33,8 @@ ui.service('api', function($http, apiConfig) {
 
   
   this.getLocation = function(address) {
-    var url = apiConfig.base_url + '/location'
-
     return new Promise(function(resolve, reject) {
-      $http.post(url, {address: address})
+      $http.post(apiConfig.url_location, {address: address})
       .then(function(response) {
         // Handle invalid/unknown addresses
         if (response.data.results == null)     return reject('no results')
@@ -57,8 +60,9 @@ ui.service('api', function($http, apiConfig) {
 
   this.getDirections = function(address_from, address_to) {
     return new Promise(function(resolve, reject) {
-      $http.post(apiConfig.base_url, {address_from: address_from, address_to: address_to})
+      $http.post(apiConfig.url_directions, {address_from: address_from, address_to: address_to})
       .then(function(response) {
+
         // As the server returns markup on success or error, simply resolve.
         resolve(response.data)
 
@@ -71,10 +75,8 @@ ui.service('api', function($http, apiConfig) {
 
 
   this.sendEmail = function(email, address_from, address_to) {
-    var url = apiConfig.base_url + '/email'
-
     return new Promise(function(resolve, reject) {
-      $http.post(url, {email: email, address_from: address_from, address_to: address_to})
+      $http.post(apiConfig.url_email, {email: email, address_from: address_from, address_to: address_to})
       .then(function(response) {
         resolve()
       }).catch(function(err) {
