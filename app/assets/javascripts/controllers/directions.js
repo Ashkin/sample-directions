@@ -191,6 +191,8 @@ angular.module('ui')
         marker.not_found = null
         $scope.directions.markup = null
         clear_polylines()
+        // And trigger a view update update next cycle
+        _scope_update()
 
         // update its placement, and update the map
         move_marker(marker, geometry)
