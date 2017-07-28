@@ -242,7 +242,7 @@ class Api::V1::DirectionsController < Api::V1::BaseController
   # Generate pdf
   def get_pdf_data(from, to)
     # Fetch Directions
-    markup = get_directions_markup(from, to)
+    markup = get_directions_markup( get_directions_data(from, to) )
 
     # Generate PDF
     kit = PDFKit.new(markup, :page_size => 'Letter')
