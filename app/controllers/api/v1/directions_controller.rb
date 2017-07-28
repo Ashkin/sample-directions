@@ -49,7 +49,7 @@ class Api::V1::DirectionsController < Api::V1::BaseController
         directions_data = get_directions_data( params['address_from'], params['address_to'] )
 
         # Handle: no route
-        return  unless assert_addresses_exist(address_from, address_to)
+        return  unless assert_directions_exist(directions_data)
 
         # Construct json response
         markup    = get_directions_markup(directions_data)
