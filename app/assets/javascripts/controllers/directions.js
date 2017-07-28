@@ -105,8 +105,8 @@ angular.module('ui')
   $scope.request_pdf = function() {
     if (! directions_exist()) return  // Guard: no directions
 
-    from = document.getElementById("pdf-form-address-from")
-    to   = document.getElementById("pdf-form-address-to")
+    var from = document.getElementById("pdf-form-address-from")
+    var to   = document.getElementById("pdf-form-address-to")
 
     from.value = $scope.markers.from.address
     to.value   = $scope.markers.to.address
